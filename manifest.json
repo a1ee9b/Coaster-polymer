@@ -1,0 +1,7 @@
+{
+  "name": "Coaster",
+  "short_name": "Coaster",
+  "description": "Protocol the amount and costs of your drinks, so you can keep an oversite",
+  "start_url": "/",
+  "display": "standalone"
+}

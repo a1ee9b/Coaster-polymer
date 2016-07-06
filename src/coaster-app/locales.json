@@ -1,0 +1,22 @@
+{
+	"en": {
+		"total": "Total ${total}",
+		"all_paid": "All paid",
+		"drink": "Drink",
+		"add": "Add",
+		"edit": "Edit {name}",
+		"close": "Close",
+		"remove": "Remove",
+		"currency_sign": "$"
+	},
+	"de": {
+		"total": "Insgesamt {total} €",
+		"all_paid": "Alles bezahlt",
+		"drink": "Getränk",
+		"add": "Hinzufügen",
+		"edit": "{name} bearbeiten",
+		"close": "Schließen",
+		"remove": "Löschen",
+		"currency_sign": "€"
+	}
+}

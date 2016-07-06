@@ -1,0 +1,203 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../../bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../../bower_components/paper-ripple/paper-ripple.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-styles/color.html">
+<link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+
+<link rel="import" href="../../bower_components/iron-localstorage/iron-localstorage.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+
+<link rel="import" href="../../bower_components/app-localize-behavior/app-localize-behavior.html">
+
+<link rel="import" href="coaster-drink.html">
+<link rel="import" href="drink-style.html">
+
+<dom-module id="coaster-app">
+	<template>
+		<style include="iron-flex iron-flex-alignment drink-style">
+		<style is="custom-style">
+			:host {
+				@apply(--paper-font-common-base);
+				display: block;
+			}
+			#drink-grid coaster-drink, #drink-grid .drink-element {
+				margin: 10px;
+			}
+			.add {
+				background-color: var(--paper-blue-grey-700);
+				color: #FFFFFF;
+			}
+			.buttons {
+				padding: 8px 8px 8px 8px;
+			}
+		</style>
+
+		<iron-localstorage
+			name="my-drinks"
+			value="{{drinks}}"
+			on-iron-localstorage-load-empty="initializeDefaultDrinks"
+		></iron-localstorage>
+
+		<paper-toolbar>
+			<div class="title">{{localize('total', 'total', total)}}</div>
+			<paper-icon-button icon="done-all" title="{{localize('all_paid')}}" on-tap="allPaid"></paper-icon-button>
+		</paper-toolbar>
+
+		<div id="drink-grid" class="horizontal layout wrap center-justified">
+
+			<template is="dom-repeat" items="{{drinks}}">
+				<coaster-drink id="{{item.id}}" name="{{item.name}}" amount="{{item.amount}}" costs="{{item.costs}}"></coaster-drink>
+			</template>
+
+			<div class="drink-element horizontal center-justified layout" elevation="1" on-tap="addDrinkModal">
+				<div class="vertical center-justified layout">
+					<paper-fab icon="add" title="add"></paper-fab>
+				</div>
+			</div>
+		</div>
+		
+		
+		<paper-dialog
+			id="dialog-addDrink"
+			dynamic-align="true"
+			with-backdrop="true"
+			entry-animation="fade-in-animation"
+            exit-animation="fade-out-animation">
+			<h3>{{localize('add')}}</h3>
+			
+			<paper-input label="Drink" value="{{name}}"></paper-input>
+			<paper-input label="Amount" value="{{amount}}" type="number"></paper-input>
+			<paper-input label="Costs" value="{{costs}}" type="number">
+				<div suffix> {{localize('currency_sign')}}</div>
+			</paper-input>
+			
+			<br>
+
+			<div class="buttons layout horizontal">
+				<paper-button raised dialog-confirm class="add layout flex" on-tap="addDrink">{{localize('add')}}</paper-button>
+			</div>
+		</paper-dialog>
+
+
+	</template>
+	<script>
+		Polymer({
+			is: 'coaster-app',
+			properties: {
+				drinks: {
+					type: 'Array',
+					notify: true,
+					value: []
+				},
+				total: {
+					value: 0,
+					type: 'Integer',
+					notify: true,
+				},
+				language: {
+					value: function () {
+						console.log(navigator.language);
+						if (navigator.language) {
+							if (navigator.language.includes('-')) {
+								return navigator.language.split('-')[0];
+							} else {
+								return navigator.language;
+							}
+						} else {
+							return navigator.browserLanguage;
+						}
+					},
+					type: String,
+				},
+
+				name: {
+					type: 'String',
+					notify: true,
+				},
+				amount: {
+					value: 1,
+					type: 'Integer',
+					notify: true,
+				},
+				costs: {
+					type: 'Float',
+					notify: true,
+				},
+			},
+
+			attached: function() {
+				this.loadResources(this.resolveUrl('locales.json'));
+			},
+			behaviors: [
+				Polymer.AppLocalizeBehavior
+			],
+			listeners: {
+				'removed': 'drinkRemoved',
+			},
+			observers: [
+				'calculateTotal(drinks.*)',
+			],
+
+			initializeDefaultDrinks: function () {
+				var tempItems = new Array();
+
+				this.drinks = tempItems.slice();
+			},
+			calculateTotal: function() {
+				var total = 0;
+				for (var i = this.drinks.length - 1; i >= 0; i--) {
+					var drink = this.drinks[i];
+					total = total + drink.amount * drink.costs;
+				}
+
+				total = total.toFixed(2);
+				this.total = total;
+			},
+			addDrinkModal: function (e) {
+				e.cancelBubble = true;
+				document.querySelector('#dialog-addDrink').open();
+			},
+			addDrink: function (e) {
+				var drink = {
+					id: Date.now(),
+					name: this.name,
+					amount: this.amount,
+					costs: this.costs,
+				}
+
+				this.push('drinks', drink);
+
+				this.lastId = drink.id;
+				this.name = '';
+				this.amount = 1;
+				this.costs = 0;
+			},
+			drinkRemoved: function (e) {
+				var drink = e.detail.drink;
+				
+				var index = -1;
+				// find index
+				for (var i = this.drinks.length - 1; i >= 0; i--) {
+					var current = this.drinks[i];
+					if (current.name == drink.name && current.costs == drink.costs && current.amount == drink.amount) {
+						index = i;
+						break;
+					}
+				}
+
+				if (i >= 0) {
+					this.splice('drinks', i, 1);
+				}
+			},
+			allPaid: function () {
+				this.splice('drinks', 0, this.drinks.length);
+			},
+		});
+	</script>
+</dom-module>

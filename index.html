@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Coaster</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="/manifest.json">
+    <script src="safari-intl-polyfill.js"></script>
+    <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
+    <link rel="import" href="theme.html">
+    <link rel="import" href="src/coaster-app/coaster-app.html">
+  </head>
+  <body>
+    <platinum-sw-register auto-register>
+      <platinum-sw-cache></platinum-sw-cache>
+    </platinum-sw-register>
+    <coaster-app class="blue"></coaster-app>
+  </body>
+</html>
