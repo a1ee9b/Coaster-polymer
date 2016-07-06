@@ -4,7 +4,18 @@ Protocol the amount and costs of your drinks, so you can keep an oversite
 
 ## Install the Polymer-CLI
 
-First, make sure you have the [Polymer CLI](https://www.npmjs.com/package/polymer-cli) installed. Then run `polymer serve` to serve your application locally.
+First, make sure you have the [Polymer CLI](https://www.npmjs.com/package/polymer-cli)  and [Bower CLI](https://bower.io/) installed.
+
+```
+$ npm install -g polymer-cli
+$ npm install -g bower
+```
+
+## Prepare the local development
+
+```
+$ bower update
+```
 
 ## Viewing Your Application
 
